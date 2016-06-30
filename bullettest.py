@@ -12,56 +12,8 @@ FPS = 20
 maxspeed = 15
 
 screen = pygame.display.set_mode(size)
+everything = pygame.sprite.Group()
 
-def main():
-    gameOver = False
-    starfield = stars()
-    user = player()
-    enemy = player()
-    enemy.__init__(True)
-
-
-            
-    pygame.display.set_caption('Galaxian')
-    while not gameOver:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                gameOver = True
-            if event.type == pygame.KEYDOWN:
-                user.trigger = 1
-                if event.key == pygame.K_LEFT:
-                    user.speed = -2
-                elif event.key == pygame.K_RIGHT:
-                    user.speed = 2
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                    user.trigger = 2
-                    user.speed = 0
-
-        cpumove(enemy,user)
-            
-        user.updateposition()
-        enemy.updateposition()
-        
-        user.checkbounds()
-        enemy.checkbounds()
-        
-        screen.fill(sky)
-        
-        starfield.drawstars()
-        
-        user.drawplayer()
-        enemy.drawplayer()
-        pygame.display.update()
-        clock.tick(FPS)
-
-        
-        moveplayer(user)
-        moveplayer(enemy)
-        print(user.rect.left," ",user.rect.right)
-        
-    pygame.quit()
-    quit()
 
 def cpumove(cpu,target):
     if target.rect.left < cpu.rect.left:
@@ -125,7 +77,7 @@ class stars():
                 
                 
 class player(pygame.sprite.Sprite):
-    def __init__(self,isenemy=False):
+    def __init__(self,groups,weapon_groups,isenemy=False):
         pygame.sprite.Sprite.__init__(self)
         if not isenemy:
             self.image, self.rect = load_image('fighter_scale.png',-1)
@@ -139,6 +91,8 @@ class player(pygame.sprite.Sprite):
         self.speed = 0
         self.move = [0,0]
         self.trigger = 0
+        self.groups = [groups, weapon_groups]
+        self.shot = False
     def checkbounds(self):
         if self.rect.left < 0:
             self.rect.left = 0
@@ -152,6 +106,87 @@ class player(pygame.sprite.Sprite):
         self.rect = self.rect.move(self.move)
     def drawplayer(self):
         screen.blit(self.image,self.rect)
+    def shoot(self):
+        x,y = self.rect.center
+        self.shot = bullet(x,y)
+        self.shot.add(self.groups)
+
+class bullet(pygame.sprite.Sprite):
+    def __init__(self,x,y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((10,20),pygame.SRCALPHA, 32)
+        self.image = self.image.convert_alpha()
+        #for i in range(5, 0, -1):
+        #    color = 255.0 * float(i)/5
+        #pygame.draw.circle(self.image, (225, 15, 15), (5, 5), 5, 0)
+        pygame.draw.rect(self.image,(12,225,15),(4,0,2,20))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y-36)
+
+    def update(self):
+        x, y = self.rect.center
+        y -= 20
+        self.rect.center = x, y
+        if y <= 0:
+            self.kill()
+
+
+def main():
+    gameOver = False
+    starfield = stars()
+    
+    #enemy = player()
+    #enemy.__init__(True)
+
+    weapon_fire = pygame.sprite.Group()
+    user = player(everything,weapon_fire)
+    pygame.display.set_caption('Galaxian')
+    while not gameOver:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                gameOver = True
+            if event.type == pygame.KEYDOWN:
+                user.trigger = 1
+                if event.key == pygame.K_LEFT:
+                    user.speed = -2
+                elif event.key == pygame.K_RIGHT:
+                    user.speed = 2
+                elif event.key == pygame.K_UP:
+                    user.shoot()
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    user.trigger = 2
+                    user.speed = 0
+
+        #cpumove(enemy,user)
+            
+        user.updateposition()
+        #enemy.updateposition()
+        
+        user.checkbounds()
+        #enemy.checkbounds()
+        
+        screen.fill(sky)
+        
+        starfield.drawstars()
+        
+        user.drawplayer()
+        #enemy.drawplayer()
+        everything.update()
+        everything.draw(screen)
+        pygame.display.update()
+        clock.tick(FPS)
+
+        
+        moveplayer(user)
+        #moveplayer(enemy)
+        print(user.rect.left," ",user.rect.right)
+        
+    pygame.quit()
+    quit()
+
+
+        
     
         
          
@@ -159,5 +194,6 @@ class player(pygame.sprite.Sprite):
 
 
 main()
+
 
 
