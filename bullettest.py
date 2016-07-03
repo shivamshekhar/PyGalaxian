@@ -102,7 +102,7 @@ class player(pygame.sprite.Sprite):
             self.rect.right = width
             self.move[0] = 0
             self.speed=0
-    def updateposition(self):
+    def update(self):
         self.rect = self.rect.move(self.move)
     def drawplayer(self):
         screen.blit(self.image,self.rect)
@@ -160,7 +160,7 @@ def main():
 
         #cpumove(enemy,user)
             
-        user.updateposition()
+        user.update()
         #enemy.updateposition()
         
         user.checkbounds()
