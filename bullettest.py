@@ -12,7 +12,7 @@ FPS = 20
 maxspeed = 15
 
 screen = pygame.display.set_mode(size)
-everything = pygame.sprite.Group()
+#everything = pygame.sprite.Group()
 
 
 def cpumove(cpu,target):
@@ -77,7 +77,7 @@ class stars():
                 
                 
 class player(pygame.sprite.Sprite):
-    def __init__(self,groups,weapon_groups,isenemy=False):
+    def __init__(self,isenemy = False):#groups,weapon_groups,isenemy=False):
         pygame.sprite.Sprite.__init__(self)
         if not isenemy:
             self.image, self.rect = load_image('fighter_scale.png',-1)
@@ -92,7 +92,7 @@ class player(pygame.sprite.Sprite):
         self.fire = 0
         self.move = [0,0]
         self.trigger = 0
-        self.groups = [groups, weapon_groups]
+        #self.groups = [groups, weapon_groups]
         self.shot = False
     def checkbounds(self):
         if self.rect.left < 0:
@@ -112,11 +112,11 @@ class player(pygame.sprite.Sprite):
     def shoot(self):
         x,y = self.rect.center
         self.shot = bullet(x,y)
-        self.shot.add(self.groups)
+        #self.shot.add(self.groups)
 
 class bullet(pygame.sprite.Sprite):
     def __init__(self,x,y):
-        pygame.sprite.Sprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self,self.containers)
         self.image = pygame.Surface((10,20),pygame.SRCALPHA, 32)
         self.image = self.image.convert_alpha()
         #for i in range(5, 0, -1):
@@ -141,8 +141,14 @@ def main():
     #enemy = player()
     #enemy.__init__(True)
 
-    weapon_fire = pygame.sprite.Group()
-    user = player(everything,weapon_fire)
+    #weapon_fire = pygame.sprite.Group()
+    bullets = pygame.sprite.Group()
+    #all = pygame.sprite.RenderUpdates()
+
+    #player.containers = all
+    bullet.containers = bullets
+
+    user = player()#everything,weapon_fire)
     pygame.display.set_caption('Galaxian')
     while not gameOver:
         for event in pygame.event.get():
@@ -171,15 +177,19 @@ def main():
         user.checkbounds()
         #enemy.checkbounds()
         
+        
         screen.fill(sky)
-        
         starfield.drawstars()
-        
+
         user.drawplayer()
+        bullets.update()
         #enemy.drawplayer()
-        everything.update()
-        everything.draw(screen)
+        #everything.update()
+        #everything.draw(screen)
+        bullets.draw(screen)
         pygame.display.update()
+        
+
         clock.tick(FPS)
 
         
