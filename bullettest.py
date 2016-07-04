@@ -50,7 +50,7 @@ def moveplayer(Player):
             if Player.move[0] > 0:
                 Player.move[0] = 0
         elif Player.move[0] <= maxspeed and Player.move[0] > 0 and Player.trigger == 2:
-            Player.move[0] -= Player.move[0]/20
+            Player.move[0] -= math.fabs(Player.move[0]/20)
             if Player.move[0] < 0:
                 Player.move[0] = 0
 
@@ -89,6 +89,7 @@ class player(pygame.sprite.Sprite):
             self.rect.left = width/2
         
         self.speed = 0
+        self.fire = 0
         self.move = [0,0]
         self.trigger = 0
         self.groups = [groups, weapon_groups]
@@ -104,6 +105,8 @@ class player(pygame.sprite.Sprite):
             self.speed=0
     def update(self):
         self.rect = self.rect.move(self.move)
+        if self.fire == 1:
+        	self.shoot()
     def drawplayer(self):
         screen.blit(self.image,self.rect)
     def shoot(self):
@@ -152,11 +155,13 @@ def main():
                 elif event.key == pygame.K_RIGHT:
                     user.speed = 2
                 elif event.key == pygame.K_UP:
-                    user.shoot()
+                    user.fire = 1
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     user.trigger = 2
                     user.speed = 0
+                if event.key == pygame.K_UP:
+                	user.fire = 0
 
         #cpumove(enemy,user)
             
@@ -180,7 +185,7 @@ def main():
         
         moveplayer(user)
         #moveplayer(enemy)
-        print(user.rect.left," ",user.rect.right)
+        print(user.rect.left,user.move[0],user.rect.right)
         
     pygame.quit()
     quit()
