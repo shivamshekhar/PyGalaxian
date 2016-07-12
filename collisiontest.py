@@ -11,6 +11,8 @@ clock = pygame.time.Clock()
 FPS = 20
 maxspeed = 15
 
+
+
 screen = pygame.display.set_mode(size)
 #everything = pygame.sprite.Group()
 
@@ -23,9 +25,9 @@ def cpumove(cpu,target):
         cpu.trigger = 1
         cpu.speed = 2
     if random.randrange(0,3) == 1:
-        self.fire = 1
+        cpu.fire = 1
     else:
-        self.fire = 0
+        cpu.fire = 0
 
       
 
@@ -113,13 +115,16 @@ class player(pygame.sprite.Sprite):
         self.rect = self.rect.move(self.movement)
         if self.fire == 1:
             self.shoot()
+
     def drawplayer(self):
         screen.blit(self.image,self.rect)
     def shoot(self):
         x,y = self.rect.center
         #self.shot = bullet(x,y)
+        
         self.shot = bullet(x-14,y,1)
         self.shot = bullet(x+14,y,1)
+        
         #self.shot.add(self.groups)
 
 
@@ -158,6 +163,7 @@ class enemy(pygame.sprite.Sprite):
 
         if self.fire == 1:
             self.shoot()
+
         if self.health <= 0:
             self.kill()
             
@@ -165,7 +171,7 @@ class enemy(pygame.sprite.Sprite):
         screen.blit(self.image,self.rect)
     def shoot(self):
         x,y = self.rect.center
-        self.shot = bullet(x,y,-1)
+        self.shot = enemybullet(x,y)
         #self.shot.add(self.groups)
 
 
@@ -189,6 +195,26 @@ class bullet(pygame.sprite.Sprite):
         if y <= 0 or y >= height:
             self.kill()
 
+class enemybullet(pygame.sprite.Sprite):
+    def __init__(self,x,y,direction = -1):
+        pygame.sprite.Sprite.__init__(self,self.containers)
+        self.image = pygame.Surface((10,10),pygame.SRCALPHA, 32)
+        self.image = self.image.convert_alpha()
+        for i in range(5, 0, -1):
+            color = 255.0 * float(i)/5
+            pygame.draw.circle(self.image, (color,0,0), (5, 5), i, 0)
+        #pygame.draw.rect(self.image,(12,225,15),(0,0,2,20))
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y-direction*20)
+        self.direction = direction
+
+    def update(self):
+        x, y = self.rect.center
+        y -= self.direction*20
+        self.rect.center = x, y
+        if y <= 0 or y >= height:
+            self.kill()
+
 
 def main():
     gameOver = False
@@ -199,12 +225,14 @@ def main():
 
     #weapon_fire = pygame.sprite.Group()
     bullets = pygame.sprite.Group()
+    enemybullets = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
     #all = pygame.sprite.RenderUpdates()
 
     #player.containers = all
     bullet.containers = bullets
     enemy.containers = enemies
+    enemybullet.containers = enemybullets
 
     user = player()#everything,weapon_fire)
     opponent = enemy()
@@ -222,6 +250,7 @@ def main():
                     user.speed = 2
                 elif event.key == pygame.K_UP:
                     user.fire = 1
+                    
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                     user.trigger = 2
@@ -229,12 +258,20 @@ def main():
                 if event.key == pygame.K_UP:
                     user.fire = 0
 
-        #cpumove(opponent,user)
+
+        cpumove(opponent,user)
         #cpumove(opponent1,user)
         
         for enemyhit in pygame.sprite.groupcollide(enemies,bullets,0,1):
             opponent.health -= 1
 
+        for firedbullet in pygame.sprite.spritecollide(user,enemybullets,1):
+            user.health -= 1
+
+        pygame.sprite.groupcollide(bullets,enemybullets,1,1)
+
+        if user.health <= 0:
+            gameOver = True
         user.update()
         #opponent.update()
         #enemy.updateposition()
@@ -251,10 +288,12 @@ def main():
         #opponent.drawplayer()
         enemies.update()
         bullets.update()
+        enemybullets.update()
         #enemy.drawplayer()
         #everything.update()
         #everything.draw(screen)
         bullets.draw(screen)
+        enemybullets.draw(screen)
         enemies.draw(screen)
         pygame.display.update()
         
@@ -265,7 +304,7 @@ def main():
         moveplayer(user)
         #moveplayer(opponent)
         #moveplayer(opponent1)
-        print(len(bullets),len(enemies),opponent.health,user.rect.left,user.movement[0],user.rect.right)
+        print(opponent.health,user.health,user.rect.left,user.movement[0],user.rect.right)
         
     pygame.quit()
     quit()
