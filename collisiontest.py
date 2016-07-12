@@ -22,6 +22,10 @@ def cpumove(cpu,target):
     elif target.rect.left > cpu.rect.left:
         cpu.trigger = 1
         cpu.speed = 2
+    if random.randrange(0,3) == 1:
+        self.fire = 1
+    else:
+        self.fire = 0
 
       
 
@@ -41,19 +45,19 @@ def load_image(name, colorkey=None):
 def moveplayer(Player):
     if Player.rect.left >= 0 and Player.rect.right <= width:
         if Player.trigger == 1:
-            Player.move[0] = Player.move[0] + Player.speed
-            if Player.move[0] < -maxspeed:
-               Player.move[0] = -maxspeed
-            elif Player.move[0] > maxspeed:
-                Player.move[0] = maxspeed
-        elif Player.move[0] >= -maxspeed and Player.move[0] < 0 and Player.trigger == 2:
-            Player.move[0] += math.fabs(Player.move[0]/20)
-            if Player.move[0] > 0:
-                Player.move[0] = 0
-        elif Player.move[0] <= maxspeed and Player.move[0] > 0 and Player.trigger == 2:
-            Player.move[0] -= math.fabs(Player.move[0]/20)
-            if Player.move[0] < 0:
-                Player.move[0] = 0
+            Player.movement[0] = Player.movement[0] + Player.speed
+            if Player.movement[0] < -maxspeed:
+               Player.movement[0] = -maxspeed
+            elif Player.movement[0] > maxspeed:
+                Player.movement[0] = maxspeed
+        elif Player.movement[0] >= -maxspeed and Player.movement[0] < 0 and Player.trigger == 2:
+            Player.movement[0] += math.fabs(Player.movement[0]/20)
+            if Player.movement[0] > 0:
+                Player.movement[0] = 0
+        elif Player.movement[0] <= maxspeed and Player.movement[0] > 0 and Player.trigger == 2:
+            Player.movement[0] -= math.fabs(Player.movement[0]/20)
+            if Player.movement[0] < 0:
+                Player.movement[0] = 0
 
 
            
@@ -91,21 +95,22 @@ class player(pygame.sprite.Sprite):
         
         self.speed = 0
         self.fire = 0
-        self.move = [0,0]
+        self.movement = [0,0]
         self.trigger = 0
+        self.health = 100
         #self.groups = [groups, weapon_groups]
         self.shot = False
     def checkbounds(self):
         if self.rect.left < 0:
             self.rect.left = 0
-            self.move[0] = 0
+            self.movement[0] = 0
             self.speed = 0
         if self.rect.right > width:
             self.rect.right = width
-            self.move[0] = 0
+            self.movement[0] = 0
             self.speed=0
     def update(self):
-        self.rect = self.rect.move(self.move)
+        self.rect = self.rect.move(self.movement)
         if self.fire == 1:
             self.shoot()
     def drawplayer(self):
@@ -125,35 +130,37 @@ class enemy(pygame.sprite.Sprite):
         self.image, self.rect = load_image('fighter3_scale.png',-1)
         self.image = pygame.transform.rotate(self.image,180)
         self.rect.top = 100
-        self.rect.left = random.randrange(0,width-2)
+        self.rect.left = random.randrange(0,width-72)
     
         self.speed = 0
         self.fire = 0
-        self.move = [0,0]
+        self.movement = [0,0]
         self.trigger = 0
+        self.health = 100
+        
         #self.groups = [groups, weapon_groups]
         self.shot = False
     def checkbounds(self):
         if self.rect.left < 0:
             self.rect.left = 0
-            self.move[0] = 0
+            self.movement[0] = 0
             self.speed = 0
         if self.rect.right > width:
             self.rect.right = width
-            self.move[0] = 0
+            self.movement[0] = 0
             self.speed=0
     def update(self):
         self.checkbounds()
         moveplayer(self)
 
-        self.rect = self.rect.move(self.move)
-        if random.randrange(0,3) == 1:
-            self.fire = 1
-        else:
-            self.fire = 0
+        self.rect = self.rect.move(self.movement)
+        
 
         if self.fire == 1:
             self.shoot()
+        if self.health <= 0:
+            self.kill()
+            
     def drawplayer(self):
         screen.blit(self.image,self.rect)
     def shoot(self):
@@ -222,8 +229,12 @@ def main():
                 if event.key == pygame.K_UP:
                     user.fire = 0
 
-        cpumove(opponent,user)
+        #cpumove(opponent,user)
         #cpumove(opponent1,user)
+        
+        for enemyhit in pygame.sprite.groupcollide(enemies,bullets,0,1):
+            opponent.health -= 1
+
         user.update()
         #opponent.update()
         #enemy.updateposition()
@@ -254,7 +265,7 @@ def main():
         moveplayer(user)
         #moveplayer(opponent)
         #moveplayer(opponent1)
-        print(user.rect.left,user.move[0],user.rect.right)
+        print(len(bullets),len(enemies),opponent.health,user.rect.left,user.movement[0],user.rect.right)
         
     pygame.quit()
     quit()
@@ -268,6 +279,7 @@ def main():
 
 
 main()
+
 
 
 
