@@ -12,8 +12,6 @@ FPS = 20
 maxspeed = 15
 
 screen = pygame.display.set_mode(size)
-#everything = pygame.sprite.Group()
-
 
 def cpumove(cpu,target):
     if target.rect.left < cpu.rect.left:
@@ -33,7 +31,6 @@ def load_image(name, colorkey=None):
         if colorkey is -1:
             colorkey = image.get_at((0,0))
         image.set_colorkey(colorkey, RLEACCEL)
-    image = pygame.transform.scale(image,(72,72))
     return image, image.get_rect()
 
 
@@ -78,10 +75,10 @@ class stars():
                 
                 
 class player(pygame.sprite.Sprite):
-    def __init__(self,isenemy = False):#groups,weapon_groups,isenemy=False):
+    def __init__(self,isenemy = False):
         pygame.sprite.Sprite.__init__(self)
         if not isenemy:
-            self.image, self.rect = load_image('fighter1_scale.png',-1)
+            self.image, self.rect = load_image('fighter_scale.png',-1)
             self.rect.top = 500
             self.rect.left = 200
         else:
@@ -93,7 +90,6 @@ class player(pygame.sprite.Sprite):
         self.fire = 0
         self.move = [0,0]
         self.trigger = 0
-        #self.groups = [groups, weapon_groups]
         self.shot = False
     def checkbounds(self):
         if self.rect.left < 0:
@@ -107,79 +103,27 @@ class player(pygame.sprite.Sprite):
     def update(self):
         self.rect = self.rect.move(self.move)
         if self.fire == 1:
-            self.shoot()
+        	self.shoot()
     def drawplayer(self):
         screen.blit(self.image,self.rect)
     def shoot(self):
         x,y = self.rect.center
-        #self.shot = bullet(x,y)
-        self.shot = bullet(x-14,y,1)
-        self.shot = bullet(x+14,y,1)
-        #self.shot.add(self.groups)
-
-
-class enemy(pygame.sprite.Sprite):
-    def __init__(self):#groups,weapon_groups,isenemy=False):
-        pygame.sprite.Sprite.__init__(self,self.containers)
+        self.shot = bullet(x,y)
         
-        self.image, self.rect = load_image('fighter3_scale.png',-1)
-        self.image = pygame.transform.rotate(self.image,180)
-        self.rect.top = 100
-        self.rect.left = random.randrange(0,width-2)
-    
-        self.speed = 0
-        self.fire = 0
-        self.move = [0,0]
-        self.trigger = 0
-        #self.groups = [groups, weapon_groups]
-        self.shot = False
-    def checkbounds(self):
-        if self.rect.left < 0:
-            self.rect.left = 0
-            self.move[0] = 0
-            self.speed = 0
-        if self.rect.right > width:
-            self.rect.right = width
-            self.move[0] = 0
-            self.speed=0
-    def update(self):
-        self.checkbounds()
-        moveplayer(self)
-
-        self.rect = self.rect.move(self.move)
-        if random.randrange(0,3) == 1:
-            self.fire = 1
-        else:
-            self.fire = 0
-
-        if self.fire == 1:
-            self.shoot()
-    def drawplayer(self):
-        screen.blit(self.image,self.rect)
-    def shoot(self):
-        x,y = self.rect.center
-        self.shot = bullet(x,y,-1)
-        #self.shot.add(self.groups)
-
-
 class bullet(pygame.sprite.Sprite):
-    def __init__(self,x,y,direction = 1):
+    def __init__(self,x,y):
         pygame.sprite.Sprite.__init__(self,self.containers)
-        self.image = pygame.Surface((2,20),pygame.SRCALPHA, 32)
+        self.image = pygame.Surface((10,20),pygame.SRCALPHA, 32)
         self.image = self.image.convert_alpha()
-        #for i in range(5, 0, -1):
-         #   color = 255.0 * float(i)/5
-          #  pygame.draw.circle(self.image, (color,0,0), (5, 5), i, 0)
-        pygame.draw.rect(self.image,(12,225,15),(0,0,2,20))
+        pygame.draw.rect(self.image,(12,225,15),(4,0,2,20))
         self.rect = self.image.get_rect()
-        self.rect.center = (x, y-direction*20)
-        self.direction = direction
+        self.rect.center = (x, y-36)
 
     def update(self):
         x, y = self.rect.center
-        y -= self.direction*20
+        y -= 20
         self.rect.center = x, y
-        if y <= 0 or y >= height:
+        if y <= 0:
             self.kill()
 
 
@@ -187,21 +131,10 @@ def main():
     gameOver = False
     starfield = stars()
     
-    #enemy = player()
-    #enemy.__init__(True)
-
-    #weapon_fire = pygame.sprite.Group()
     bullets = pygame.sprite.Group()
-    enemies = pygame.sprite.Group()
-    #all = pygame.sprite.RenderUpdates()
-
-    #player.containers = all
     bullet.containers = bullets
-    enemy.containers = enemies
 
-    user = player()#everything,weapon_fire)
-    opponent = enemy()
-    #opponent1 = enemy()
+    user = player()
     pygame.display.set_caption('Galaxian')
     while not gameOver:
         for event in pygame.event.get():
@@ -220,31 +153,18 @@ def main():
                     user.trigger = 2
                     user.speed = 0
                 if event.key == pygame.K_UP:
-                    user.fire = 0
-
-        cpumove(opponent,user)
-        #cpumove(opponent1,user)
+                	user.fire = 0
+    
         user.update()
-        #opponent.update()
-        #enemy.updateposition()
         
         user.checkbounds()
-        #opponent.checkbounds()
-        #enemy.checkbounds()
-        
         
         screen.fill(sky)
         starfield.drawstars()
 
         user.drawplayer()
-        #opponent.drawplayer()
-        enemies.update()
         bullets.update()
-        #enemy.drawplayer()
-        #everything.update()
-        #everything.draw(screen)
         bullets.draw(screen)
-        enemies.draw(screen)
         pygame.display.update()
         
 
@@ -252,8 +172,6 @@ def main():
 
         
         moveplayer(user)
-        #moveplayer(opponent)
-        #moveplayer(opponent1)
         print(user.rect.left,user.move[0],user.rect.right)
         
     pygame.quit()
@@ -262,11 +180,6 @@ def main():
 
         
     
-        
-         
-
-
-
 main()
 
 
