@@ -1,7 +1,5 @@
-from __future__ import print_function
 import os,pygame,sys,time,math,random
 from pygame.locals import *
-
 
 pygame.init()
 
@@ -24,12 +22,12 @@ def cpumove(cpu,target):
     elif target.rect.left > cpu.rect.left:
         cpu.trigger = 1
         cpu.speed = 2
-    if random.randrange(0,3) == 1:
+    if random.randrange(0,10) == 1:
         cpu.fire = 1
     else:
-        cpu.fire = 0
+        cpu.fire = 0    
 
-\
+
 def bossmove(cpu,target):
     if target.rect.left < cpu.rect.left and cpu.spree == False:
         cpu.trigger = 1
@@ -47,13 +45,14 @@ def bossmove(cpu,target):
         cpu.fire = 0
 
     
-    if cpu.spree == False and random.randrange(0,200) == 71:
+    if cpu.spree == False and random.randrange(0,250) == 71:
     	cpu.spree = True
     else:
     	pass
 
+      
 
-def load_image(name, sizex, sizey,colorkey=None):
+def load_image(name, sizex, sizey, colorkey=None):
     fullname = os.path.join('Sprites', name)
     image = pygame.image.load(fullname)
     image = image.convert()
@@ -63,7 +62,9 @@ def load_image(name, sizex, sizey,colorkey=None):
         image.set_colorkey(colorkey, RLEACCEL)
 
     image = pygame.transform.scale(image,(sizex,sizey))
+    
     return image, image.get_rect()
+
 
 def showhealthbar(health,barcolor,pos,unit):
     healthbar = pygame.Surface((health*unit,10),pygame.SRCALPHA, 32)
@@ -119,9 +120,6 @@ class player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image, self.rect = load_image('fighter1_scale.png',72,72,-1)
-        #self.image = pygame.transform.scale(self.image,(72,72))
-        
-        self.rect = self.image.get_rect()
         self.rect.top = 500
         self.rect.left = 200
         
@@ -130,6 +128,7 @@ class player(pygame.sprite.Sprite):
         self.movement = [0,0]
         self.trigger = 0
         self.health = 100
+        self.kills = 0
         self.shot = False
     def checkbounds(self):
         if self.rect.left < 0:
@@ -144,10 +143,9 @@ class player(pygame.sprite.Sprite):
         self.rect = self.rect.move(self.movement)
         if self.fire == 1:
             self.shoot()
-
+        
     def drawplayer(self):
         screen.blit(self.image,self.rect)
-
     def shoot(self):
         x,y = self.rect.center
         self.shot = bullet(x-14,y,1)
@@ -157,20 +155,17 @@ class boss(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self,self.containers)
         
-        self.image, self.rect = load_image('fighter3.png',200,200,-1)
-        
-        #self.image = pygame.transform.scale(self.image,(200,200))
-        self.rect = self.image.get_rect()
+        self.image, self.rect = load_image('fighter3_scale.png',-1)
         self.image = pygame.transform.rotate(self.image,180)
         self.rect.top = 100
         self.rect.left = random.randrange(0,width-72)
-        
-
+    
         self.speed = 0
         self.fire = 0
         self.movement = [0,0]
         self.trigger = 0
         self.health = 1000
+
         self.bulletformation = 0
         self.bulletspeed = 20
         self.spreecount = 0
@@ -195,6 +190,7 @@ class boss(pygame.sprite.Sprite):
         if self.fire == 1:
             self.shoot(self.bulletformation,self.bulletspeed)
 
+
         if self.health <= 0:
             self.kill()
 
@@ -209,27 +205,23 @@ class boss(pygame.sprite.Sprite):
         else:
         	self.spree = False
         	self.spreecount = 0
-    
+            
     def drawplayer(self):
         screen.blit(self.image,self.rect)
-    def shoot(self,bulletformation=0,bulletspeed=20):
+    def shoot(self):
         x,y = self.rect.center
     	if bulletformation == 0:
     		self.shot = enemybullet(x,y + (self.rect.height)/2,[0,1],bulletspeed)
     		self.shot = enemybullet(x - self.rect.width/2 + 5,y - (self.rect.height)/2 + 30,[0,1],bulletspeed)
     		self.shot = enemybullet(x + self.rect.width/2 - 5,y - (self.rect.height)/2 + 30,[0,1],bulletspeed)
     	elif bulletformation == 1:
-            self.shot = enemybullet(x ,y ,[1.5,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[-1.5,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[1.2,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[-1.2,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[0,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[0.9,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[-0.9,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[0.6,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[-0.6,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[0.3,1],bulletspeed)
-            self.shot = enemybullet(x ,y ,[-0.3,1],bulletspeed)
+    		self.shot = enemybullet(x ,y ,[1,1],bulletspeed)
+    		self.shot = enemybullet(x ,y ,[-1,1],bulletspeed)
+    		self.shot = enemybullet(x ,y ,[0,1],bulletspeed)
+    		self.shot = enemybullet(x ,y ,[0.5,1],bulletspeed)
+    		self.shot = enemybullet(x ,y ,[-0.5,1],bulletspeed)
+    		self.shot = enemybullet(x ,y ,[2,1],bulletspeed)
+    		self.shot = enemybullet(x ,y ,[-2,1],bulletspeed)
     		
     	elif bulletformation == 2:
     		pass
@@ -237,7 +229,6 @@ class boss(pygame.sprite.Sprite):
     		pass	
     	elif bulletformation == 4:
     		pass
-
         
 
 class enemy(pygame.sprite.Sprite):
@@ -309,29 +300,96 @@ class enemy(pygame.sprite.Sprite):
 
         if self.fire == 1:
             self.shoot()
-
+        
         if self.health <= 0:
-            self.kill()
-            x, y = self.rect.center
-            if pygame.mixer.get_init():
-                self.explosion_sound.play(maxtime=1000)
-            explosion(x,y)
+	        x,y = self.rect.center
+	        if pygame.mixer.get_init():
+	        	self.explosion_sound.play(maxtime=1000)
+	        explosion(x,y)
+	        self.kill()
+					
+
             
     def drawplayer(self):
         screen.blit(self.image,self.rect)
     def shoot(self):
         x,y = self.rect.center
-        self.shot = enemybullet(x,y)
-        #self.bulletformations()
+        self.shot = enemybullet(x,y,[0,1],18)
+        
     def autopilot(self):
         if self.rect.top < height:
             self.movement[1] = 5
         else:
             self.kill()
-    
-    def bulletformations(self):
-    	x,y = self.rect.center
-    	self.shot = enemybullet(x,y-(self.rect.height)/2)
+
+
+class enemydrones(pygame.sprite.Sprite):
+	def __init__(self):
+		pygame.sprite.Sprite.__init__(self,self.containers)
+		self.image, self.rect = load_image('enemy2_scale.png',50,102,-1)
+		self.rect.top = 0
+		self.rect.left = random.randrange(0,width-72)
+
+		self.speed = 0
+		self.fire = 1
+		self.movement = [0,0]
+		self.health = 10
+
+		self.shot = False
+		self.waitTime = 0
+		self.explosion_sound = pygame.mixer.Sound("Sprites/explosion.wav")
+		self.explosion_sound.set_volume(0.1)
+
+	def checkbounds(self):
+		if self.rect.left < 0:
+		    self.rect.left = 0
+		    self.movement[0] = 0
+		    self.speed = 0
+		if self.rect.right > width:
+		    self.rect.right = width
+		    self.movement[0] = 0
+		    self.speed=0
+	def update(self):
+		self.checkbounds()
+		self.autopilot()
+		self.rect = self.rect.move(self.movement)
+
+
+		if self.fire == 1 and self.waitTime % 10 == 1:
+			self.shoot()
+
+		if self.health <= 0:
+			x,y = self.rect.center
+			if pygame.mixer.get_init():
+				self.explosion_sound.play(maxtime=1000)
+			explosion(x,y)
+			self.kill()
+		
+	
+	def drawplayer(self):
+		screen.blit(self.image,self.rect)
+	def shoot(self):
+		x,y = self.rect.center
+		self.shot = enemybullet(x,y+self.rect.height/2,[0,1],10)
+		self.shot = enemybullet(x,y+self.rect.height/2,[-0.5,1],10)
+		self.shot = enemybullet(x,y+self.rect.height/2,[0.5,1],10)
+		self.shot = enemybullet(x,y+self.rect.height/2,[-1,1],10)
+		self.shot = enemybullet(x,y+self.rect.height/2,[1,1],10)
+		
+	def autopilot(self):
+		if self.rect.top < height - 450:
+			self.movement[1] = 3
+		elif self.rect.top > height - 450 and self.waitTime < 1000:
+			self.movement[1] = 0
+			self.waitTime += 1
+
+		if self.waitTime >= 200:
+			self.movement[1] = 5 
+
+		if self.rect.top > height:
+			self.kill()
+
+
 
 
 
@@ -340,7 +398,6 @@ class bullet(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self,self.containers)
         self.image = pygame.Surface((2,18),pygame.SRCALPHA, 32)
         self.image = self.image.convert_alpha()
-        
         pygame.draw.rect(self.image,(12,225,15),(0,0,2,18))
         self.rect = self.image.get_rect()
         self.rect.center = (x, y-direction*20)
@@ -360,7 +417,7 @@ class enemybullet(pygame.sprite.Sprite):
         self.image = self.image.convert_alpha()
         for i in range(5, 0, -1):
             color = 255.0 * float(i)/5
-            pygame.draw.circle(self.image, (color,0,155), (5, 5), i, 0)
+            pygame.draw.circle(self.image, (color,0,0), (5, 5), i, 0)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)#+ direction[1]*20)
         self.direction = direction
@@ -402,7 +459,6 @@ class explosion(pygame.sprite.Sprite):
             self.kill()
 
 
-
 def main():
     gameOver = False
     starfield = stars()
@@ -411,20 +467,21 @@ def main():
     enemybullets = pygame.sprite.Group()
     enemies = pygame.sprite.Group()
     explosions = pygame.sprite.Group()
+    shields = pygame.sprite.Group()
+    drones = pygame.sprite.Group()
     
     bullet.containers = bullets
     boss.containers = enemies
     enemybullet.containers = enemybullets
     enemy.containers = enemies
     explosion.containers = explosions
-
+    enemydrones.containers = drones
+    
     user = player()
-    #enemy()
-    finalboss = boss()
-
+    enemy()
     pygame.display.set_caption('Galaxian')
-    #bg_music = pygame.mixer.Sound("Sprites/bg_music.wav")
-    #bg_music.play(-1)
+    bg_music = pygame.mixer.Sound("Sprites/bg_music.wav")
+    bg_music.play(-1)
 
     
 
@@ -448,33 +505,34 @@ def main():
                     user.speed = 0
                 if event.key == pygame.K_UP:
                     user.fire = 0
-
-        #if random.randrange(0,8) == 1 and len(enemies) < 10:
-         #   enemy(random.randrange(0,4))
+                
+        if random.randrange(0,8) == 1 and len(enemies) < 10:
+            enemy(random.randrange(0,4))
         
-        #for ship in enemies:
-         #   cpumove(ship,user)
-        bossmove(finalboss, user)
-        for userbullet in bullets:
-            if pygame.sprite.collide_mask(finalboss,userbullet):
-                finalboss.health -= 1
-                userbullet.kill()
-
-        #for userbullet in bullets:
-         #   if pixel_perfect_check_collision(userbullet, finalboss) == True:
-          #      finalboss.health -= 1
-           #     userbullet.kill()
-            
-
+    	if random.randrange(0,20) == 1 and len(drones) < 3:
+            enemydrones()
         
+        for ship in enemies:
+			cpumove(ship,user)
+			
+
+        for enemyhit in pygame.sprite.groupcollide(enemies,bullets,0,1):
+			enemyhit.health -= 1
+			if enemyhit.health <= 0:
+				user.kills += 1
+
+		
         for firedbullet in pygame.sprite.spritecollide(user,enemybullets,1):
-            user.health -= 1
-        
-        #for enemycollided in pygame.sprite.spritecollide(user, enemies, 0):
-         #   user.health -= 10
-          #  enemycollided.health -= 2
+			user.health -= 1
 
-        
+        for enemycollided in enemies: 
+        	if pygame.sprite.collide_mask(user,enemycollided):
+	            user.health -= 10
+	            enemycollided.kill()
+	            x,y = enemycollided.rect.center
+	            if pygame.mixer.get_init():
+	            	enemycollided.explosion_sound.play(maxtime=1000)
+	            explosion(x,y)
 
         pygame.sprite.groupcollide(bullets,enemybullets,1,1)
         
@@ -488,21 +546,19 @@ def main():
         starfield.drawstars()
         showhealthbar(user.health,green,[100,(height - 20),user.health*8,10],8)
         displaytext("HEALTH",22, 50,height - 15,green)
-        
-        showhealthbar(finalboss.health,red,[100,20,finalboss.health*0.8,10],0.8)
-        displaytext("BOSS",22,50,25,red)
-        
         user.drawplayer()
         
         enemies.update()
         bullets.update()
         enemybullets.update()
         explosions.update()
+        drones.update()
         
         bullets.draw(screen)
         enemybullets.draw(screen)
         enemies.draw(screen)
         explosions.draw(screen)
+        drones.draw(screen)
         
         pygame.display.update()
         
@@ -510,7 +566,7 @@ def main():
 
         moveplayer(user)
         
-        print(user.health,finalboss.spreecount,finalboss.spree)
+        print(user.kills,user.health,user.rect.left,user.movement[0],user.rect.right)
         
     pygame.quit()
     quit()
