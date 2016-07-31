@@ -176,6 +176,7 @@ class boss(pygame.sprite.Sprite):
         self.spreecount = 0
         self.spree = False
         self.shot = False
+        self.reloadtime = 0
     def checkbounds(self):
         if self.rect.left < 0:
             self.rect.left = 0
@@ -192,8 +193,11 @@ class boss(pygame.sprite.Sprite):
         self.rect = self.rect.move(self.movement)
         
 
-        if self.fire == 1:
+        if self.fire == 1 and self.reloadtime == 0:
             self.shoot(self.bulletformation,self.bulletspeed)
+
+        if self.reloadtime > 0:
+            self.reloadtime -= 1
 
         if self.health <= 0:
             self.kill()
@@ -216,8 +220,8 @@ class boss(pygame.sprite.Sprite):
         x,y = self.rect.center
     	if bulletformation == 0:
     		self.shot = enemybullet(x,y + (self.rect.height)/2,[0,1],bulletspeed)
-    		self.shot = enemybullet(x - self.rect.width/2 + 5,y - (self.rect.height)/2 + 30,[0,1],bulletspeed)
-    		self.shot = enemybullet(x + self.rect.width/2 - 5,y - (self.rect.height)/2 + 30,[0,1],bulletspeed)
+    		self.shot = enemybullet(x - self.rect.width/2 + 20,y - (self.rect.height)/2 + 30,[0,1],bulletspeed)
+    		self.shot = enemybullet(x + self.rect.width/2 - 20,y - (self.rect.height)/2 + 30,[0,1],bulletspeed)
     	elif bulletformation == 1:
             self.shot = enemybullet(x ,y ,[1.5,1],bulletspeed)
             self.shot = enemybullet(x ,y ,[-1.5,1],bulletspeed)
@@ -232,7 +236,8 @@ class boss(pygame.sprite.Sprite):
             self.shot = enemybullet(x ,y ,[-0.3,1],bulletspeed)
     		
     	elif bulletformation == 2:
-    		pass
+            splittingbullet(x,y,[0,1],bulletspeed)
+            self.reloadtime = 100
     	elif bulletformation == 3:
     		pass	
     	elif bulletformation == 4:
@@ -375,6 +380,36 @@ class enemybullet(pygame.sprite.Sprite):
             self.kill()
 
 
+class splittingbullet(pygame.sprite.Sprite):
+    def __init__(self,x,y,direction,speed):
+        pygame.sprite.Sprite.__init__(self,self.containers)
+        self.image = pygame.Surface((10,10),pygame.SRCALPHA, 32)
+        self.image = self.image.convert_alpha()
+        for i in range(5, 0, -1):
+            color = 255.0 * float(i)/5
+            pygame.draw.circle(self.image, (color,0,155), (5, 5), i, 0)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)#+ direction[1]*20)
+        self.initpos = (x,y)
+        self.direction = direction
+        self.speed = speed
+
+    def update(self):
+        x, y = self.rect.center
+        y += self.direction[1]*self.speed
+        x += self.direction[0]*self.speed
+        self.rect.center = x, y
+
+        if self.rect.top > self.initpos[1] + 20:
+            if len(self.containers) < 10:
+                splittingbullet(self.rect.centerx - 10,self.rect.centery + 10, [-0.5,1],self.speed)
+                splittingbullet(self.rect.centerx + 10,self.rect.centery + 10, [0.5,1],self.speed)
+                self.kill()
+        if y <= 0 or y >= height or x <= 0 or x >= width:
+            self.kill()
+
+
+
 class explosion(pygame.sprite.Sprite):
     def __init__(self,x,y):
         pygame.sprite.Sprite.__init__(self, self.containers)
@@ -417,6 +452,7 @@ def main():
     enemybullet.containers = enemybullets
     enemy.containers = enemies
     explosion.containers = explosions
+    splittingbullet.containers = enemybullets
 
     user = player()
     #enemy()
