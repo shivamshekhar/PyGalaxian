@@ -216,27 +216,29 @@ class player(pygame.sprite.Sprite):
 
 
 class boss(pygame.sprite.Sprite):
-
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self, self.containers)
-
-        (self.image, self.rect) = load_image('fighter3_scale.png', -1)
-        self.image = pygame.transform.rotate(self.image, 180)
+        pygame.sprite.Sprite.__init__(self,self.containers)
+        
+        self.image, self.rect = load_image('fighter3.png',200,200,-1)
+        
+        #self.image = pygame.transform.scale(self.image,(200,200))
+        self.rect = self.image.get_rect()
+        self.image = pygame.transform.rotate(self.image,180)
         self.rect.top = 100
-        self.rect.left = random.randrange(0, width - 72)
+        self.rect.left = random.randrange(0,width-72)
+        
 
         self.speed = 0
         self.fire = 0
-        self.movement = [0, 0]
+        self.movement = [0,0]
         self.trigger = 0
         self.health = 1000
-
         self.bulletformation = 0
         self.bulletspeed = 20
         self.spreecount = 0
         self.spree = False
         self.shot = False
-
+        self.reloadtime = 0
     def checkbounds(self):
         if self.rect.left < 0:
             self.rect.left = 0
@@ -245,16 +247,19 @@ class boss(pygame.sprite.Sprite):
         if self.rect.right > width:
             self.rect.right = width
             self.movement[0] = 0
-            self.speed = 0
-
+            self.speed=0
     def update(self):
         self.checkbounds()
         moveplayer(self)
 
         self.rect = self.rect.move(self.movement)
+        
 
-        if self.fire == 1:
-            self.shoot(self.bulletformation, self.bulletspeed)
+        if self.fire == 1 and self.reloadtime == 0:
+            self.shoot(self.bulletformation,self.bulletspeed)
+
+        if self.reloadtime > 0:
+            self.reloadtime -= 1
 
         if self.health <= 0:
             self.kill()
@@ -264,47 +269,40 @@ class boss(pygame.sprite.Sprite):
             if self.spreecount % 5 == 1:
                 self.movement[0] = 0
                 self.speed = 0
-                self.shoot(1, 10)
+                self.shoot(1,10)
             else:
                 pass
         else:
             self.spree = False
             self.spreecount = 0
-
+    
     def drawplayer(self):
-        screen.blit(self.image, self.rect)
-
-    def shoot(self):
-        (x, y) = self.rect.center
+        screen.blit(self.image,self.rect)
+    def shoot(self,bulletformation=0,bulletspeed=20):
+        x,y = self.rect.center
         if bulletformation == 0:
-            self.shot = enemybullet(x, y + self.rect.height / 2, (0,
-                                    255, 0), [0, 1], bulletspeed)
-            self.shot = enemybullet(x - self.rect.width / 2 + 5, y
-                                    - self.rect.height / 2 + 30, (0,
-                                    255, 0), [0, 1], bulletspeed)
-            self.shot = enemybullet(x + self.rect.width / 2 - 5, y
-                                    - self.rect.height / 2 + 30, (0,
-                                    255, 0), [0, 1], bulletspeed)
+            self.shot = enemybullet(x,y + (self.rect.height)/2,(255,0,255),[0,1],bulletspeed)
+            self.shot = enemybullet(x - self.rect.width/2 + 20,y - (self.rect.height)/2 + 30,(255,0,255),[0,1],bulletspeed)
+            self.shot = enemybullet(x + self.rect.width/2 - 20,y - (self.rect.height)/2 + 30,(255,0,255),[0,1],bulletspeed)
         elif bulletformation == 1:
-            self.shot = enemybullet(x, y, (0, 255, 0), [1, 1],
-                                    bulletspeed)
-            self.shot = enemybullet(x, y, (0, 255, 0), [-1, 1],
-                                    bulletspeed)
-            self.shot = enemybullet(x, y, (0, 255, 0), [0, 1],
-                                    bulletspeed)
-            self.shot = enemybullet(x, y, (0, 255, 0), [0.5, 1],
-                                    bulletspeed)
-            self.shot = enemybullet(x, y, (0, 255, 0), [-0.5, 1],
-                                    bulletspeed)
-            self.shot = enemybullet(x, y, (0, 255, 0), [2, 1],
-                                    bulletspeed)
-            self.shot = enemybullet(x, y, (0, 255, 0), [-2, 1],
-                                    bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[1.5,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[-1.5,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[1.2,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[-1.2,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[0,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[0.9,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[-0.9,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[0.6,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[-0.6,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[0.3,1],bulletspeed)
+            self.shot = enemybullet(x ,y ,(255,0,255),[-0.3,1],bulletspeed)
+            
         elif bulletformation == 2:
-
+            #splittingbullet(x,y,[0,1],bulletspeed)
+            #self.reloadtime = 100
             pass
         elif bulletformation == 3:
-            pass
+            pass    
         elif bulletformation == 4:
             pass
 
@@ -503,6 +501,7 @@ class enemysaucer(pygame.sprite.Sprite):
         self.waitTime = 0
         self.fire = 1
         self.movement = [0, 0]
+        self.haltpos = random.randrange(300,510)
         self.shot = False
         self.explosion_sound = \
             pygame.mixer.Sound('Sprites/explosion.wav')
@@ -546,9 +545,9 @@ class enemysaucer(pygame.sprite.Sprite):
         self.shot = enemybullet(x, y, (0, 0, 255), [0, 1], 18)
 
     def autopilot(self):
-        if self.rect.top < height - 500:
+        if self.rect.top < height - self.haltpos:
             self.movement[1] = 3
-        elif self.rect.top > height - 500 and self.waitTime < 1000:
+        elif self.rect.top > height - self.haltpos and self.waitTime < 1000:
             self.movement[1] = 0
             self.waitTime += 1
 
@@ -768,6 +767,8 @@ class explosion(pygame.sprite.Sprite):
 def main():
     gameOver = False
     menuExit = False
+    stageStart = False
+    bossStage = False
     
     wavecounter = 0
     wave = 0
@@ -805,149 +806,233 @@ def main():
       #      if event.type == pygame.QUIT
 
     while not gameOver:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        while not menuExit:
+            menuExit = True
+            stageStart = True
+            #bossStage = True
+            #finalboss = boss()
+        
+        while stageStart:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    stageStart = False
+                    gameOver = True
+                if event.type == pygame.KEYDOWN:
+                    user.trigger = 1
+                    if event.key == pygame.K_LEFT:
+                        user.speed = -2
+                    elif event.key == pygame.K_RIGHT:
+                        user.speed = 2
+                    elif event.key == pygame.K_UP:
+                        user.fire = 1
+
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT or event.key \
+                        == pygame.K_RIGHT:
+                        user.trigger = 2
+                        user.speed = 0
+                    if event.key == pygame.K_UP:
+                        user.fire = 0
+
+            if random.randrange(0, 8) == 1 and len(enemies) < 10 and (wave == 0 or wave == 5 or wave == 6 or wave == 9):
+                enemy(random.randrange(0, 4))
+
+            if random.randrange(0, 20) == 1 and len(saucers) < 3 and (wave == 1 or wave == 5 or wave == 7 or wave == 8):
+                enemysaucer(random.randrange(0, width - 50))
+
+            if random.randrange(0, 30) == 21 and len(drones) < 2 and (wave == 2 or wave == 4 or wave == 7 or wave == 9):
+                if len(drones) > 0:
+                    for drone in drones:
+                        if drone.rect.left < width / 2:
+                            enemydrone(random.randrange(width / 2 + 60,
+                                       width - 60))
+                        else:
+                            enemydrone(random.randrange(0, width / 2 - 60))
+                else:
+                    enemydrone(random.randrange(0, width - 60))
+
+            if len(station) < 1 and (wave == 3 or wave == 10):
+                enemystation(random.randrange(0, width - 60))
+
+            if wave == 11:
+                bossStage = True
+                stageStart = False
+                finalboss = boss()
+                user.health = 200
+
+            for ship in enemies:
+                cpumove(ship, user)
+
+            for enemyhit in pygame.sprite.groupcollide(enemies, bullets, 0,
+                    1):
+                enemyhit.health -= 1
+                if enemyhit.health <= 0:
+                    user.kills += 1
+
+            for dronehit in pygame.sprite.groupcollide(drones, bullets, 0,
+                    1):
+                dronehit.health -= 1
+                if dronehit.health <= 0:
+                    user.kills += 1
+
+            for saucerhit in pygame.sprite.groupcollide(saucers, bullets,
+                    0, 1):
+                saucerhit.health -= 1
+                if saucerhit.health <= 0:
+                    user.kills += 1
+
+            for stationhit in pygame.sprite.groupcollide(station, bullets,
+                    0, 1):
+                stationhit.health -= 1
+                if stationhit.health <= 0:
+                    user.kills += 1
+                    healthpack(stationhit.rect.centerx,
+                               stationhit.rect.centery)
+
+            for firedbullet in pygame.sprite.spritecollide(user,
+                    enemybullets, 1):
+                user.health -= 1
+
+            for enemycollided in enemies:
+                if pygame.sprite.collide_mask(user, enemycollided):
+                    user.health -= 2
+                    enemycollided.health -= enemycollided.health
+
+            for dronecollided in drones:
+                if pygame.sprite.collide_mask(user, dronecollided):
+                    user.health -= 10
+                    dronecollided.health -= dronecollided.health
+
+            for saucercollided in saucers:
+                if pygame.sprite.collide_mask(user, saucercollided):
+                    user.health -= 4
+                    saucercollided.health -= saucercollided.health
+
+            for stationcollided in station:
+                if pygame.sprite.collide_mask(user,
+                        stationcollided):
+                    user.health -= 50
+                    stationcollided.health -= stationcollided.health
+
+            for health_pack in healthpacks:
+                if pygame.sprite.collide_mask(user, health_pack):
+                    user.health += health_pack.health
+                    health_pack.health -= health_pack.health
+
+            #pygame.sprite.groupcollide(bullets, enemybullets, 1, 1)
+
+            if user.health <= 0:
                 gameOver = True
-            if event.type == pygame.KEYDOWN:
-                user.trigger = 1
-                if event.key == pygame.K_LEFT:
-                    user.speed = -2
-                elif event.key == pygame.K_RIGHT:
-                    user.speed = 2
-                elif event.key == pygame.K_UP:
-                    user.fire = 1
+                stageStart = False
+            user.update()
+            user.checkbounds()
 
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key \
-                    == pygame.K_RIGHT:
-                    user.trigger = 2
-                    user.speed = 0
-                if event.key == pygame.K_UP:
-                    user.fire = 0
+            screen.fill(sky)
+            starfield.drawstars()
+            showhealthbar(user.health, green, [100, height - 20,
+                          user.health * 4, 10], 4)
+            displaytext('HEALTH', 22, 50, height - 15, green)
+            user.drawplayer()
 
-        if random.randrange(0, 8) == 1 and len(enemies) < 10 and (wave == 0 or wave == 5 or wave == 6 or wave == 9):
-            enemy(random.randrange(0, 4))
+            enemies.update()
+            bullets.update()
+            enemybullets.update()
+            explosions.update()
+            drones.update()
+            saucers.update()
+            station.update()
+            healthpacks.update()
 
-        if random.randrange(0, 20) == 1 and len(saucers) < 3 and (wave == 1 or wave == 5 or wave == 7 or wave == 8):
-            enemysaucer(random.randrange(0, width - 50))
+            bullets.draw(screen)
+            enemybullets.draw(screen)
+            enemies.draw(screen)
+            explosions.draw(screen)
+            drones.draw(screen)
+            saucers.draw(screen)
+            station.draw(screen)
+            healthpacks.draw(screen)
 
-        if random.randrange(0, 30) == 21 and len(drones) < 2 and (wave == 2 or wave == 4 or wave == 7 or wave == 9):
-            if len(drones) > 0:
-                for drone in drones:
-                    if drone.rect.left < width / 2:
-                        enemydrone(random.randrange(width / 2 + 60,
-                                   width - 60))
-                    else:
-                        enemydrone(random.randrange(0, width / 2 - 60))
-            else:
-                enemydrone(random.randrange(0, width - 60))
+            wave = storyboard(wavecounter)
 
-        if len(station) < 1 and (wave == 3 or wave == 10):
-            enemystation(random.randrange(0, width - 60))
+            wavecounter += 1
 
-        for ship in enemies:
-            cpumove(ship, user)
+            pygame.display.update()
 
-        for enemyhit in pygame.sprite.groupcollide(enemies, bullets, 0,
-                1):
-            enemyhit.health -= 1
-            if enemyhit.health <= 0:
-                user.kills += 1
+            clock.tick(FPS)
 
-        for dronehit in pygame.sprite.groupcollide(drones, bullets, 0,
-                1):
-            dronehit.health -= 1
-            if dronehit.health <= 0:
-                user.kills += 1
+            moveplayer(user)
 
-        for saucerhit in pygame.sprite.groupcollide(saucers, bullets,
-                0, 1):
-            saucerhit.health -= 1
-            if saucerhit.health <= 0:
-                user.kills += 1
+            print (user.kills, user.health, user.rect.left,
+                   user.movement[0], user.rect.right)
 
-        for stationhit in pygame.sprite.groupcollide(station, bullets,
-                0, 1):
-            stationhit.health -= 1
-            if stationhit.health <= 0:
-                user.kills += 1
-                healthpack(stationhit.rect.centerx,
-                           stationhit.rect.centery)
 
-        for firedbullet in pygame.sprite.spritecollide(user,
-                enemybullets, 1):
-            user.health -= 1
+        while bossStage:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    gameOver = True
+                if event.type == pygame.KEYDOWN:
+                    user.trigger = 1
+                    if event.key == pygame.K_LEFT:
+                        user.speed = -2
+                    elif event.key == pygame.K_RIGHT:
+                        user.speed = 2
+                    elif event.key == pygame.K_UP:
+                        user.fire = 1
 
-        for enemycollided in enemies:
-            if pygame.sprite.collide_mask(user, enemycollided):
-                user.health -= 2
-                enemycollided.health -= enemycollided.health
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT or event.key \
+                        == pygame.K_RIGHT:
+                        user.trigger = 2
+                        user.speed = 0
+                    if event.key == pygame.K_UP:
+                        user.fire = 0
 
-        for dronecollided in drones:
-            if pygame.sprite.collide_mask(user, dronecollided):
-                user.health -= 10
-                dronecollided.health -= dronecollided.health
+            
+            bossmove(finalboss, user)
+            for userbullet in bullets:
+                if pygame.sprite.collide_mask(finalboss,userbullet):
+                    finalboss.health -= 1
+                    userbullet.kill()
 
-        for saucercollided in saucers:
-            if pygame.sprite.collide_mask(user, saucercollided):
-                user.health -= 4
-                saucercollided.health -= saucercollided.health
+            for firedbullet in pygame.sprite.spritecollide(user,enemybullets,1):
+                user.health -= 1
+            
+            #pygame.sprite.groupcollide(bullets,enemybullets,1,1)
+        
+            if user.health <= 0:
+                gameOver = True
+                bossStage = False
+        
+            user.update()
+            user.checkbounds()
 
-        for stationcollided in station:
-            if pygame.sprite.collide_mask(user,
-                    stationcollided):
-                user.health -= 50
-                stationcollided.health -= stationcollided.health
+            screen.fill(sky)
+            starfield.drawstars()
+            showhealthbar(user.health, green, [100, height - 20,
+                          user.health * 4, 10], 4)
+            displaytext('HEALTH', 22, 50, height - 15, green)
+            
+            showhealthbar(finalboss.health,red,[100,20,finalboss.health*0.8,10],0.8)
+            displaytext("BOSS",22,50,25,red)
+        
+            user.drawplayer()
 
-        for health_pack in healthpacks:
-            if pygame.sprite.collide_mask(user, health_pack):
-                user.health += health_pack.health
-                health_pack.health -= health_pack.health
+            enemies.update()
+            bullets.update()
+            enemybullets.update()
+            explosions.update()
+            
+            bullets.draw(screen)
+            enemybullets.draw(screen)
+            enemies.draw(screen)
+            explosions.draw(screen)
+            
+            pygame.display.update()
+            clock.tick(FPS)
+            moveplayer(user)
 
-        #pygame.sprite.groupcollide(bullets, enemybullets, 1, 1)
 
-        if user.health <= 0:
-            gameOver = True
-        user.update()
-        user.checkbounds()
 
-        screen.fill(sky)
-        starfield.drawstars()
-        showhealthbar(user.health, green, [100, height - 20,
-                      user.health * 4, 10], 4)
-        displaytext('HEALTH', 22, 50, height - 15, green)
-        user.drawplayer()
-
-        enemies.update()
-        bullets.update()
-        enemybullets.update()
-        explosions.update()
-        drones.update()
-        saucers.update()
-        station.update()
-        healthpacks.update()
-
-        bullets.draw(screen)
-        enemybullets.draw(screen)
-        enemies.draw(screen)
-        explosions.draw(screen)
-        drones.draw(screen)
-        saucers.draw(screen)
-        station.draw(screen)
-        healthpacks.draw(screen)
-
-        wave = storyboard(wavecounter)
-
-        wavecounter += 1
-
-        pygame.display.update()
-
-        clock.tick(FPS)
-
-        moveplayer(user)
-
-        print (user.kills, user.health, user.rect.left,
-               user.movement[0], user.rect.right)
 
     pygame.quit()
     quit()
