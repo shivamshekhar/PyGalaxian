@@ -105,23 +105,26 @@ def displaytext(
 
 
 def moveplayer(Player):
-    if Player.rect.left >= 0 and Player.rect.right <= width:
-        if Player.trigger == 1:
-            Player.movement[0] = Player.movement[0] + Player.speed
-            if Player.movement[0] < -maxspeed:
-                Player.movement[0] = -maxspeed
-            elif Player.movement[0] > maxspeed:
-                Player.movement[0] = maxspeed
-        elif Player.movement[0] >= -maxspeed and Player.movement[0] < 0 \
-            and Player.trigger == 2:
-            Player.movement[0] += math.fabs(Player.movement[0] / 20)
-            if Player.movement[0] > 0:
-                Player.movement[0] = 0
-        elif Player.movement[0] <= maxspeed and Player.movement[0] > 0 \
-            and Player.trigger == 2:
-            Player.movement[0] -= math.fabs(Player.movement[0] / 20)
-            if Player.movement[0] < 0:
-                Player.movement[0] = 0
+    if Player.isautopilot == False:        
+        if Player.rect.left >= 0 and Player.rect.right <= width:
+            if Player.trigger == 1:
+                Player.movement[0] = Player.movement[0] + Player.speed
+                if Player.movement[0] < -maxspeed:
+                    Player.movement[0] = -maxspeed
+                elif Player.movement[0] > maxspeed:
+                    Player.movement[0] = maxspeed
+            elif Player.movement[0] >= -maxspeed and Player.movement[0] < 0 \
+                and Player.trigger == 2:
+                Player.movement[0] += math.fabs(Player.movement[0] / 20)
+                if Player.movement[0] > 0:
+                    Player.movement[0] = 0
+            elif Player.movement[0] <= maxspeed and Player.movement[0] > 0 \
+                and Player.trigger == 2:
+                Player.movement[0] -= math.fabs(Player.movement[0] / 20)
+                if Player.movement[0] < 0:
+                    Player.movement[0] = 0
+    else:
+        Player.autopilot()
 
 
 def storyboard(wavecounter):
@@ -186,6 +189,7 @@ class player(pygame.sprite.Sprite):
         self.trigger = 0
         self.health = 200
         self.kills = 0
+        self.isautopilot = False
         self.shot = False
 
     def checkbounds(self):
@@ -213,17 +217,25 @@ class player(pygame.sprite.Sprite):
         (x, y) = self.rect.center
         self.shot = bullet(x - 14, y, (0, 255, 0), 1)
         self.shot = bullet(x + 14, y, (0, 255, 0), 1)
+    def autopilot(self):
+        if self.rect.centerx < width/2:
+            self.movement[0] = 5
+        else: 
+            self.movement[0] = -5
+        if(self.rect.centerx - width/2 < 5 and self.rect.centerx - width/2 > -5):
+            self.movement[0] = 0
+            self.movement[1] = -10
 
 
 class boss(pygame.sprite.Sprite):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self,self.containers)
+        pygame.sprite.Sprite.__init__(self)
         
-        self.image, self.rect = load_image('fighter3.png',200,200,-1)
+        self.image, self.rect = load_image('boss.png',125,250,-1)
         
         #self.image = pygame.transform.scale(self.image,(200,200))
         self.rect = self.image.get_rect()
-        self.image = pygame.transform.rotate(self.image,180)
+        #self.image = pygame.transform.rotate(self.image,180)
         self.rect.top = 100
         self.rect.left = random.randrange(0,width-72)
         
@@ -238,6 +250,7 @@ class boss(pygame.sprite.Sprite):
         self.spreecount = 0
         self.spree = False
         self.shot = False
+        self.isautopilot = False
         self.reloadtime = 0
     def checkbounds(self):
         if self.rect.left < 0:
@@ -282,8 +295,8 @@ class boss(pygame.sprite.Sprite):
         x,y = self.rect.center
         if bulletformation == 0:
             self.shot = enemybullet(x,y + (self.rect.height)/2,(255,0,255),[0,1],bulletspeed)
-            self.shot = enemybullet(x - self.rect.width/2 + 20,y - (self.rect.height)/2 + 30,(255,0,255),[0,1],bulletspeed)
-            self.shot = enemybullet(x + self.rect.width/2 - 20,y - (self.rect.height)/2 + 30,(255,0,255),[0,1],bulletspeed)
+            self.shot = enemybullet(x - self.rect.width/2 + 30,y - (self.rect.height)/2 + 50,(255,0,255),[0,1],bulletspeed)
+            self.shot = enemybullet(x + self.rect.width/2 - 30,y - (self.rect.height)/2 + 50,(255,0,255),[0,1],bulletspeed)
         elif bulletformation == 1:
             self.shot = enemybullet(x ,y ,(255,0,255),[1.5,1],bulletspeed)
             self.shot = enemybullet(x ,y ,(255,0,255),[-1.5,1],bulletspeed)
@@ -297,15 +310,12 @@ class boss(pygame.sprite.Sprite):
             self.shot = enemybullet(x ,y ,(255,0,255),[0.3,1],bulletspeed)
             self.shot = enemybullet(x ,y ,(255,0,255),[-0.3,1],bulletspeed)
             
-        elif bulletformation == 2:
-            #splittingbullet(x,y,[0,1],bulletspeed)
-            #self.reloadtime = 100
-            pass
-        elif bulletformation == 3:
-            pass    
-        elif bulletformation == 4:
-            pass
-
+        if random.randrange(0,10) == 4:
+            enemy(random.randrange(0,4))
+        if random.randrange(0,50) == 41:
+            enemysaucer(random.randrange(0,width - 50))
+        if random.randrange(0,200) == 121:
+            enemydrone(random.randrange(0,width - 50))
 
 class enemy(pygame.sprite.Sprite):
 
@@ -352,6 +362,7 @@ class enemy(pygame.sprite.Sprite):
         self.movement = [0, 0]
         self.trigger = 0
         self.health = 2
+        self.isautopilot = False
 
         self.explosion_sound = \
             pygame.mixer.Sound('Sprites/explosion.wav')
@@ -770,7 +781,7 @@ def main():
     stageStart = False
     bossStage = False
     
-    wavecounter = 0
+    wavecounter = 4900
     wave = 0
 
     starfield = stars()
@@ -786,7 +797,7 @@ def main():
     healthpacks = pygame.sprite.Group()
 
     bullet.containers = bullets
-    boss.containers = enemies
+    #boss.containers = enemies
     enemybullet.containers = enemybullets
     enemy.containers = enemies
     explosion.containers = explosions
@@ -796,11 +807,12 @@ def main():
     healthpack.containers = healthpacks
 
     user = player()
-    enemy()
+    #enemy()
     pygame.display.set_caption('Galaxian')
     bg_music = pygame.mixer.Sound('Sprites/bg_music.wav')
     bg_music.play(-1)
-
+    boss_music = pygame.mixer.Sound('Sprites/boss_music.wav')
+    
     #while not menuExit:
      #   for event in pygame.event.get():
       #      if event.type == pygame.QUIT
@@ -854,11 +866,23 @@ def main():
             if len(station) < 1 and (wave == 3 or wave == 10):
                 enemystation(random.randrange(0, width - 60))
 
-            if wave == 11:
+            if wave == 11 and len(enemies) == 0 and len(saucers) == 0 and len(station) == 0 and len(drones) == 0:
+                user.isautopilot = True
+                bg_music.fadeout(6000)
+                if user.rect.top == 0:
+                    wave = 12
+
+            if wave == 12:
                 bossStage = True
                 stageStart = False
                 finalboss = boss()
-                user.health = 200
+                user.health += 80
+                user.rect.left =  width/2
+                user.rect.top = 500
+                user.isautopilot = False
+                user.movement = [0,0]
+                boss_music.play(-1)
+
 
             for ship in enemies:
                 cpumove(ship, user)
@@ -962,7 +986,7 @@ def main():
 
             moveplayer(user)
 
-            print (user.kills, user.health, user.rect.left,
+            print (wave,user.kills, user.health, user.rect.left,
                    user.movement[0], user.rect.right)
 
 
@@ -970,6 +994,7 @@ def main():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     gameOver = True
+                    bossStage = False
                 if event.type == pygame.KEYDOWN:
                     user.trigger = 1
                     if event.key == pygame.K_LEFT:
@@ -989,13 +1014,52 @@ def main():
 
             
             bossmove(finalboss, user)
+            
+            for ship in enemies:
+                cpumove(ship, user)
+
             for userbullet in bullets:
                 if pygame.sprite.collide_mask(finalboss,userbullet):
                     finalboss.health -= 1
                     userbullet.kill()
+            
+            for enemyhit in pygame.sprite.groupcollide(enemies, bullets, 0,
+                    1):
+                enemyhit.health -= 1
+                if enemyhit.health <= 0:
+                    user.kills += 1
+
+            for dronehit in pygame.sprite.groupcollide(drones, bullets, 0,
+                    1):
+                dronehit.health -= 1
+                if dronehit.health <= 0:
+                    user.kills += 1
+
+            for saucerhit in pygame.sprite.groupcollide(saucers, bullets,
+                    0, 1):
+                saucerhit.health -= 1
+                if saucerhit.health <= 0:
+                    user.kills += 1
 
             for firedbullet in pygame.sprite.spritecollide(user,enemybullets,1):
                 user.health -= 1
+
+
+            for enemycollided in enemies:
+                if pygame.sprite.collide_mask(user, enemycollided):
+                    user.health -= 2
+                    enemycollided.health -= enemycollided.health
+
+            for dronecollided in drones:
+                if pygame.sprite.collide_mask(user, dronecollided):
+                    user.health -= 10
+                    dronecollided.health -= dronecollided.health
+
+            for saucercollided in saucers:
+                if pygame.sprite.collide_mask(user, saucercollided):
+                    user.health -= 4
+                    saucercollided.health -= saucercollided.health
+
             
             #pygame.sprite.groupcollide(bullets,enemybullets,1,1)
         
@@ -1005,7 +1069,7 @@ def main():
         
             user.update()
             user.checkbounds()
-
+            
             screen.fill(sky)
             starfield.drawstars()
             showhealthbar(user.health, green, [100, height - 20,
@@ -1016,17 +1080,23 @@ def main():
             displaytext("BOSS",22,50,25,red)
         
             user.drawplayer()
-
+            
             enemies.update()
             bullets.update()
             enemybullets.update()
+            drones.update()
+            saucers.update()
             explosions.update()
+            finalboss.update()
             
             bullets.draw(screen)
             enemybullets.draw(screen)
             enemies.draw(screen)
+            drones.draw(screen)
+            saucers.draw(screen)
             explosions.draw(screen)
-            
+            finalboss.drawplayer()
+
             pygame.display.update()
             clock.tick(FPS)
             moveplayer(user)
