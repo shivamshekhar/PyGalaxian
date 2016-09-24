@@ -20,7 +20,8 @@ To run this game:
 ##### Controls:
 * Move your spaceship by pressing LEFT or RIGHT key
 * Fire lazers using UP key
-* Destroy all enemies to win the game 
+* Destroy all enemies to win the game
+* To exit the game at any point of time, just press ESC key 
 
 ### Developed by: 
 Shivam Shekhar  

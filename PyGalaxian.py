@@ -11,7 +11,7 @@ from pygame.locals import *
 
 pygame.init()
 
-size = (width, height) = (1000, 600)
+size = (width, height) = (1366, 768)
 black = (0, 0, 0)
 white = (255, 255, 255)
 green = (0, 155, 0)
@@ -21,7 +21,9 @@ clock = pygame.time.Clock()
 FPS = 21
 maxspeed = 15
 
-screen = pygame.display.set_mode(size)
+#screen = pygame.display.set_mode(size)
+screen = pygame.display.set_mode(size,DOUBLEBUF | FULLSCREEN)
+
 
 
 def cpumove(cpu, target):
@@ -216,8 +218,8 @@ class player(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         (self.image, self.rect) = load_image('fighter1_scale.png', 72,
                 72, -1)
-        self.rect.top = 500
-        self.rect.left = 200
+        self.rect.top = size[1] - 100#500
+        self.rect.left = size[0]/2#200
 
         self.speed = 0
         self.fire = 0
@@ -272,7 +274,7 @@ class boss(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
 
-        (self.image, self.rect) = load_image('boss.png', 125, 250, -1)
+        (self.image, self.rect) = load_image('boss.png', 200, 400, -1)#125, 250, -1)
         self.rect = self.image.get_rect()
         self.rect.top = 100
         self.rect.left = random.randrange(0, width - 72)
@@ -914,9 +916,9 @@ def main():
                         - 40, white)
             displaytext('Exit', 32, width / 2 - 20, height * 3 / 4,
                         white)
-            displaytext('PyGalaxian version 1.0', 12, width - 80, 575,
+            displaytext('PyGalaxian version 1.0', 12, width - 80, height - 20,
                         white)
-            displaytext('Made by: Shivam Shekhar', 12, width - 80, 590,
+            displaytext('Made by: Shivam Shekhar', 12, width - 80, height - 10,
                         white)
 
             if menuhighlight % 2 == 0:
@@ -943,6 +945,8 @@ def main():
                         user.speed = 2
                     elif event.key == pygame.K_UP:
                         user.fire = 1
+                    elif event.key == pygame.K_ESCAPE:
+                    	quit()
 
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key \
@@ -984,7 +988,7 @@ def main():
                 and len(station) == 0 and len(drones) == 0:
                 user.isautopilot = True
                 bg_music.fadeout(6000)
-                if user.rect.top == 0:
+                if user.rect.top <= -1*user.rect.height:
                     wave = 12
 
             if wave == 12:
@@ -993,7 +997,7 @@ def main():
                 finalboss = boss()
                 user.health += 80
                 user.rect.left = width / 2
-                user.rect.top = 500
+                user.rect.top = size[1] - 100
                 user.isautopilot = False
                 user.movement = [0, 0]
                 boss_music.play(-1)
@@ -1129,6 +1133,9 @@ def main():
                         user.speed = 2
                     elif event.key == pygame.K_UP:
                         user.fire = 1
+                    elif event.key == pygame.K_ESCAPE:
+                    	quit()
+
 
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key \
