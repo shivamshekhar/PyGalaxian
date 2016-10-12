@@ -11,7 +11,7 @@ from pygame.locals import *
 
 pygame.init()
 
-size = (width, height) = (1366, 768)
+size = (width, height) = (1024, 768)
 black = (0, 0, 0)
 white = (255, 255, 255)
 green = (0, 155, 0)
@@ -131,59 +131,59 @@ def moveplayer(Player):
 
 
 def storyboard(wavecounter):
-    if wavecounter >= 0 and wavecounter <= 1000:  # enemy
+    if wavecounter >= 0 and wavecounter <= 700:  # enemy
         return 0
-    elif wavecounter > 1000 and wavecounter <= 1500:
+    elif wavecounter > 700 and wavecounter <= 1100:
 
                                                      # saucer
 
         return 1
-    elif wavecounter > 1500 and wavecounter <= 2000:
+    elif wavecounter > 1100 and wavecounter <= 1500:
 
                                                      # drone
 
         return 2
-    elif wavecounter > 2000 and wavecounter <= 2200:
+    elif wavecounter > 1500 and wavecounter <= 1800:
 
                                                      # station
 
         return 3
-    elif wavecounter > 2200 and wavecounter <= 2400:
+    elif wavecounter > 1800 and wavecounter <= 2300:
 
                                                      # drone
 
         return 4
-    elif wavecounter > 2400 and wavecounter <= 3000:
+    elif wavecounter > 2300 and wavecounter <= 2700:
 
                                                      # enemy and saucer
 
         return 5
-    elif wavecounter > 3000 and wavecounter <= 3500:
+    elif wavecounter > 2700 and wavecounter <= 2900:
 
                                                      # enemy
 
         return 6
-    elif wavecounter > 3500 and wavecounter <= 3700:
+    elif wavecounter > 2900 and wavecounter <= 3300:
 
                                                      # drone and saucer
 
         return 7
-    elif wavecounter > 3700 and wavecounter <= 4000:
+    elif wavecounter > 3300 and wavecounter <= 3600:
 
                                                      # saucer
 
         return 8
-    elif wavecounter > 4000 and wavecounter <= 4500:
+    elif wavecounter > 3600 and wavecounter <= 4000:
 
                                                      # enemy and drones
 
         return 9
-    elif wavecounter > 4500 and wavecounter <= 5000:
+    elif wavecounter > 4000 and wavecounter <= 4400:
 
                                                      # station
 
         return 10
-    elif wavecounter > 5000:
+    elif wavecounter > 4400:
 
                              # boss
 
@@ -876,8 +876,8 @@ def main():
 
     user = player()
     pygame.display.set_caption('PyGalaxian')
-    bg_music = pygame.mixer.Sound('Sprites/bg_music.wav')
-    boss_music = pygame.mixer.Sound('Sprites/boss_music.wav')
+    bg_music = pygame.mixer.Sound('Sprites/bg_music.ogg')
+    boss_music = pygame.mixer.Sound('Sprites/boss_music.ogg')
 
     (logoimage, logorect) = load_image('gamelogo.png', -1, -1, -1)
     logorect.left = width / 2 - logorect.width / 2
