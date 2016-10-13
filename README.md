@@ -5,12 +5,6 @@
 ### Description:
 A simple vertical space shooter game
 
-![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/2.png)
-
-![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/3.png)
-
-![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/4.png)
-
 ### Technology:
 Built using pygame library on Python 2.7
 
@@ -30,6 +24,15 @@ To run this game:
 * Fire lazers using UP key
 * Destroy all enemies to win the game
 * To exit the game at any point of time, just press ESC key 
+
+
+### Screenshots:
+![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/2.png)
+
+![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/3.png)
+
+![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/4.png)
+
 
 ### Developed by: 
 Shivam Shekhar  
