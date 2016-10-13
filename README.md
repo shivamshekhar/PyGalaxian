@@ -1,7 +1,15 @@
 # PyGalaxian 
 
+![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/1.png)
+
 ### Description:
 A simple vertical space shooter game
+
+![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/2.png)
+
+![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/3.png)
+
+![](https://github.com/shivamshekhar/PyGalaxian/raw/master/Screenshots/4.png)
 
 ### Technology:
 Built using pygame library on Python 2.7
