@@ -16,7 +16,7 @@ black = (0, 0, 0)
 white = (255, 255, 255)
 green = (0, 155, 0)
 red = (155, 0, 0)
-sky = (0, 0, 40)
+sky = (0, 0, 0)
 clock = pygame.time.Clock()
 FPS = 21
 maxspeed = 15
@@ -192,25 +192,30 @@ def storyboard(wavecounter):
 
 class stars:
 
-    def __init__(self):
-        self.starpos = [[0 for j in range(2)] for i in range(100)]
-        for x in range(100):
+    def __init__(self,radius,color,nofstars,speed=5):
+        self.radius = radius
+        self.color = color
+        self.speed = speed
+        self.nofstars = nofstars
+        self.starpos = [[0 for j in range(2)] for i in range(self.nofstars)]
+        for x in range(self.nofstars):
             self.starpos[x][0] = random.randrange(0, width)
             self.starpos[x][1] = random.randrange(0, height)
-        
+
     def drawstars(self):
-        for x in range(100):
-            pygame.draw.rect(screen, white, [self.starpos[x][0],
-                             self.starpos[x][1], 2, 2])
+        for x in range(self.nofstars):
+            #pygame.draw.rect(screen, color, [self.starpos[x][0],
+            #                 self.starpos[x][1], 2, 2])
+            pygame.draw.circle(screen,self.color,(self.starpos[x][0],self.starpos[x][1]),self.radius)
         self.movestars()
-        
+
     def movestars(self):
-        for x in range(100):
-            self.starpos[x][1] += 5
+        for x in range(self.nofstars):
+            self.starpos[x][1] += self.speed
             if self.starpos[x][1] > height:
                 self.starpos[x][1] = 0
 
-    
+
 
 class player(pygame.sprite.Sprite):
 
@@ -853,7 +858,9 @@ def main():
     wavecounter = 0
     wave = 0
 
-    starfield = stars()
+    starfield1 = stars(1,white,50,5)
+    starfield2 = stars(1,(150,150,150),75,3)
+    starfield3 = stars(1,(75,75,75),200,1)
 
     bullets = pygame.sprite.Group()
     enemybullets = pygame.sprite.Group()
@@ -908,7 +915,9 @@ def main():
                 pass
 
             screen.fill(sky)
-            starfield.drawstars()
+            starfield1.drawstars()
+            starfield2.drawstars()
+            starfield3.drawstars()
             user.drawplayer()
             screen.blit(logoimage, logorect)
 
@@ -1001,7 +1010,7 @@ def main():
                 user.isautopilot = False
                 user.movement = [0, 0]
                 boss_music.play(-1)
-                
+
             for ship in enemies:
                 cpumove(ship, user)
 
@@ -1072,8 +1081,10 @@ def main():
             user.checkbounds()
 
             screen.fill(sky)
-            starfield.drawstars()
-            
+            starfield1.drawstars()
+            starfield2.drawstars()
+            starfield3.drawstars()
+
             if user.health > 0:
                 showhealthbar(user.health, green, [100, height - 20,
                               user.health * 4, 10], 4)
@@ -1209,7 +1220,10 @@ def main():
             user.checkbounds()
 
             screen.fill(sky)
-            starfield.drawstars()
+            starfield1.drawstars()
+            starfield2.drawstars()
+            starfield3.drawstars()
+
             if user.health > 0:
                 showhealthbar(user.health, green, [100, height - 20,
                               user.health * 4, 10], 4)
@@ -1257,7 +1271,10 @@ def main():
                     gameOver = True
 
             screen.fill(sky)
-            starfield.drawstars()
+            starfield1.drawstars()
+            starfield2.drawstars()
+            starfield3.drawstars()
+
             if user.won == False:
                 displaytext('Game Over', 26, width / 2 - 30, height
                             / 2, white)
@@ -1278,4 +1295,4 @@ def main():
     quit()
 
 
-main()			
+main()
