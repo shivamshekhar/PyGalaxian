@@ -517,7 +517,7 @@ class enemydrone(pygame.sprite.Sprite):
             (x, y) = self.rect.center
             if pygame.mixer.get_init():
                 self.explosion_sound.play(maxtime=1000)
-            explosion(x, y)
+            explosion(x, y,100)
             self.kill()
 
     def drawplayer(self):
@@ -604,7 +604,7 @@ class enemysaucer(pygame.sprite.Sprite):
             (x, y) = self.rect.center
             if pygame.mixer.get_init():
                 self.explosion_sound.play(maxtime=1000)
-            explosion(x, y)
+            explosion(x, y,75)
             self.kill()
         self.index += 1
         self.index = self.index % 7
@@ -674,7 +674,7 @@ class enemystation(pygame.sprite.Sprite):
             (x, y) = self.rect.center
             if pygame.mixer.get_init():
                 self.explosion_sound.play(maxtime=1000)
-            explosion(x, y)
+            explosion(x, y,150)
             self.kill()
 
         if self.waitTime > 0:
@@ -781,7 +781,6 @@ class bullet(pygame.sprite.Sprite):
         if y <= 0 or y >= height:
             self.kill()
 
-
 class enemybullet(pygame.sprite.Sprite):
 
     def __init__(
@@ -819,7 +818,7 @@ class enemybullet(pygame.sprite.Sprite):
 
 class explosion(pygame.sprite.Sprite):
 
-    def __init__(self, x, y):
+    def __init__(self, x, y,radius=-1):
         pygame.sprite.Sprite.__init__(self, self.containers)
         sheet = pygame.image.load('Sprites/enemy_explode.png')
         self.images = []
@@ -832,6 +831,8 @@ class explosion(pygame.sprite.Sprite):
             image.set_colorkey(colorkey, RLEACCEL)
 
             image.blit(sheet, (0, 0), rect)
+            if radius != -1:
+                image = pygame.transform.scale(image,(radius,radius))
             self.images.append(image)
 
         self.image = self.images[0]
