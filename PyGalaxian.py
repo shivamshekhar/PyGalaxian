@@ -234,6 +234,7 @@ class player(pygame.sprite.Sprite):
         self.health = 200
         self.kills = 0
         self.score = 0
+        self.shootdelay = 0
         self.isautopilot = False
         self.shot = False
         self.won = False
@@ -250,7 +251,8 @@ class player(pygame.sprite.Sprite):
 
     def update(self):
         self.rect = self.rect.move(self.movement)
-        if self.fire == 1:
+        self.shootdelay += 1
+        if self.fire == 1 and self.shootdelay%3 == 1:
             self.shoot()
 
         if self.health > 200:
@@ -289,7 +291,7 @@ class boss(pygame.sprite.Sprite):
         self.fire = 0
         self.movement = [0, 0]
         self.trigger = 0
-        self.health = 1000
+        self.health = 600
         self.bulletformation = 0
         self.bulletspeed = 20
         self.spreecount = 0
@@ -487,7 +489,7 @@ class enemydrone(pygame.sprite.Sprite):
         self.speed = 0
         self.fire = 1
         self.movement = [0, 0]
-        self.health = 30
+        self.health = 20
 
         self.shot = False
         self.waitTime = 0
@@ -572,7 +574,7 @@ class enemysaucer(pygame.sprite.Sprite):
         self.index = 0
         self.rect = self.image.get_rect()
         self.rect.center = (x, -self.rect.height)
-        self.health = 20
+        self.health = 10
         self.waitTime = 0
         self.fire = 1
         self.movement = [0, 0]
@@ -642,7 +644,7 @@ class enemystation(pygame.sprite.Sprite):
                 150, 150, -1)
 
         self.rect.center = (x, -self.rect.height)
-        self.health = 100
+        self.health = 60
         self.waitTime = 0
         self.fire = 1
         self.movement = [0, 0]
@@ -767,10 +769,13 @@ class bullet(pygame.sprite.Sprite):
         ):
 
         pygame.sprite.Sprite.__init__(self, self.containers)
-        self.image = pygame.Surface((2, 18), pygame.SRCALPHA, 32)
+        """self.image = pygame.Surface((2, 18), pygame.SRCALPHA, 32)
+
         self.image = self.image.convert_alpha()
         pygame.draw.rect(self.image, color, (0, 0, 2, 18))  # (12,225,15)
         self.rect = self.image.get_rect()
+        """
+        self.image,self.rect = load_image('lazer.png',5,25,-1)
         self.rect.center = (x, y - direction * 20)
         self.direction = direction
 
