@@ -12,6 +12,7 @@ from pygame.locals import *
 pygame.init()
 
 size = (width, height) = (1024, 768)
+#size = (width,height) = (1024,600)
 black = (0, 0, 0)
 white = (255, 255, 255)
 green = (0, 155, 0)
