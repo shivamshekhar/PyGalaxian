@@ -897,6 +897,8 @@ def main():
     logorect.left = width / 2 - logorect.width / 2
     logorect.top = height / 2 - logorect.height * 5 / 4
 
+    bg,bgrect = load_image('bg1.png')
+
     while not gameOver:
         while not menuExit:
             for event in pygame.event.get():
@@ -921,7 +923,8 @@ def main():
             else:
                 pass
 
-            screen.fill(sky)
+            #screen.fill(sky)
+            screen.blit(bg,bgrect)
             starfield1.drawstars()
             starfield2.drawstars()
             starfield3.drawstars()
@@ -1087,7 +1090,8 @@ def main():
             user.update()
             user.checkbounds()
 
-            screen.fill(sky)
+            #screen.fill(sky)
+            screen.blit(bg,bgrect)
             starfield1.drawstars()
             starfield2.drawstars()
             starfield3.drawstars()
@@ -1226,7 +1230,8 @@ def main():
             user.update()
             user.checkbounds()
 
-            screen.fill(sky)
+            #screen.fill(sky)
+            screen.blit(bg,bgrect)
             starfield1.drawstars()
             starfield2.drawstars()
             starfield3.drawstars()
